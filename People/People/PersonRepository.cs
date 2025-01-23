@@ -65,5 +65,29 @@ public class PersonRepository
 
         return new List<Person>(); // Retornar una lista vacía en caso de error
     }
+
+    public void DeletePerson(int id)
+    {
+        try
+        {
+            Init();
+
+            var personToDelete = conn.Find<Person>(id);
+            if (personToDelete != null)
+            {
+                conn.Delete(personToDelete);
+                StatusMessage = $"Registro eliminado: {personToDelete.Name}";
+            }
+            else
+            {
+                StatusMessage = "No se encontró el registro.";
+            }
+        }
+        catch (Exception ex)
+        {
+            StatusMessage = $"Error al eliminar el registro: {ex.Message}";
+        }
+    }
 }
+
 
