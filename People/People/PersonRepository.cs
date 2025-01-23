@@ -1,103 +1,69 @@
-﻿using SQLite; // Necesario para la funcionalidad SQLite
-using People.Models; // Necesario para el modelo `Person`
-using System.Collections.Generic; // Para List<T>
+﻿using SQLite;
+using People.Models;
 
 namespace People;
 
 public class PersonRepository
 {
-    private SQLiteConnection conn; // Variable privada para la conexión SQLite
-    private readonly string _dbPath; // Ruta de la base de datos
+    string _dbPath;
+    private SQLiteConnection conn;  // Campo para la conexión a la base de datos
 
-    public string StatusMessage { get; set; } // Mensajes de estado para el usuario
+    public string StatusMessage { get; set; }
 
-    // Constructor que recibe la ruta de la base de datos
+    // Inicialización de la base de datos
+    private void Init()
+    {
+        if (conn != null)
+            return;
+
+        conn = new SQLiteConnection(_dbPath);
+        conn.CreateTable<Person>(); // Crear la tabla para almacenar personas
+    }
+
     public PersonRepository(string dbPath)
     {
         _dbPath = dbPath;
     }
 
-    // Método para inicializar la conexión y crear la tabla si no existe
-    private void Init()
-    {
-        if (conn != null)
-            return; // La conexión ya está inicializada, no hacer nada
-
-        // Inicializa la conexión y crea la tabla
-        conn = new SQLiteConnection(_dbPath);
-        conn.CreateTable<Person>();
-    }
-
-    // Método para agregar una nueva persona
+    // Insertar una nueva persona en la base de datos
     public void AddNewPerson(string name)
     {
-        int result = 0; // Número de filas afectadas
+        int result = 0;
         try
         {
-            // Inicializa la conexión
-            Init();
+            Init(); // Llamar a Init para asegurarse de que la base de datos esté inicializada
 
-            // Validación básica
+            // Validación básica para asegurar que se ingrese un nombre
             if (string.IsNullOrEmpty(name))
-                throw new Exception("Debe ingresar un nombre válido.");
+                throw new Exception("Valid name required");
 
-            // Inserta la nueva persona en la base de datos
+            // Insertar la nueva persona en la base de datos
             result = conn.Insert(new Person { Name = name });
 
-            StatusMessage = $"{result} registro(s) agregado(s) (Nombre: {name})";
+            StatusMessage = string.Format("{0} record(s) added (Name: {1})", result, name);
         }
         catch (Exception ex)
         {
-            StatusMessage = $"Error al agregar {name}. Detalles: {ex.Message}";
+            StatusMessage = string.Format("Failed to add {0}. Error: {1}", name, ex.Message);
         }
     }
 
-    // Método para recuperar todas las personas
+    // Obtener todas las personas de la base de datos
     public List<Person> GetAllPeople()
     {
         try
         {
-            // Inicializa la conexión
-            Init();
+            Init(); // Inicializar la base de datos
 
-            // Recupera todas las filas de la tabla como una lista
+            // Recuperar una lista de objetos Person de la base de datos
             return conn.Table<Person>().ToList();
         }
         catch (Exception ex)
         {
-            StatusMessage = $"Error al recuperar datos. Detalles: {ex.Message}";
-            return new List<Person>(); // Retorna una lista vacía en caso de error
+            StatusMessage = string.Format("Failed to retrieve data. {0}", ex.Message);
         }
-    }
 
-    // Método para eliminar una persona por ID
-    public void DeletePerson(int id)
-    {
-        try
-        {
-            // Inicializa la conexión
-            Init();
-
-            // Validación del ID
-            if (id <= 0)
-                throw new ArgumentException("El ID debe ser mayor a 0.");
-
-            // Intenta eliminar el registro por ID
-            int rowsAffected = conn.Delete<Person>(id);
-
-            // Mensaje según el resultado
-            if (rowsAffected == 0)
-            {
-                StatusMessage = $"No se encontró ningún registro con el ID {id} para eliminar.";
-            }
-            else
-            {
-                StatusMessage = $"Registro con ID {id} eliminado correctamente.";
-            }
-        }
-        catch (Exception ex)
-        {
-            StatusMessage = $"Error al eliminar el registro: {ex.Message}";
-        }
+        return new List<Person>(); // Retornar una lista vacía en caso de error
     }
 }
+

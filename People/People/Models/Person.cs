@@ -1,8 +1,9 @@
 ﻿using SQLite;
+
 namespace People.Models;
 
-[Table("people_scabrera")]
-public class Person 
+[Table("people")]
+public class Person
 {
     [PrimaryKey, AutoIncrement]
     public int Id { get; set; }
