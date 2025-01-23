@@ -2,17 +2,21 @@
 
 public partial class App : Application
 {
-	public static PersonRepository PersonRepo { get; private set; }
+    public static PersonRepository PersonRepo { get; private set; }
 
-	public App()
-	{
-		InitializeComponent();
-		// TODO: Initialize the PersonRepository property with the PersonRespository singleton object
+    public App(PersonRepository repo)
+    {
+        InitializeComponent();
 
-	}
+        // Asignar el repositorio recibido al campo estático
+        PersonRepo = repo;
 
-	protected override Window CreateWindow(IActivationState activationState)
-	{
-		return new Window(new AppShell());
-	}
+        // Establecer la página principal
+        MainPage = new MainPage();
+    }
+
+    protected override Window CreateWindow(IActivationState activationState)
+    {
+        return new Window(new AppShell());
+    }
 }

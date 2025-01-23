@@ -1,39 +1,42 @@
-﻿<?xml version="1.0" encoding="utf-8" ?>
-<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+﻿<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             xmlns:model="clr-namespace:People.Models"
-             x:Class="People.MainPage" 
-             BackgroundColor="{DynamicResource Light}">
+             xmlns:vm="clr-namespace:People.ViewModels"
+             x:Class="People.MainPage"
+             Title="Soledad Cabrera">
 
-    <Grid Padding="5" RowSpacing="5" ColumnSpacing="5"
-          RowDefinitions="Auto,Auto,Auto,Auto,*">
+    <ContentPage.BindingContext>
+        <vm:MainViewModel />
+    </ContentPage.BindingContext>
 
-        <Entry x:Name="newPerson"
-           Placeholder="Enter name" />
+    <VerticalStackLayout>
+        <!-- Tarjeta con tu información -->
+        <Frame Padding="20" CornerRadius="10" BackgroundColor="LightGray" Margin="10">
+            <VerticalStackLayout>
+                <Label Text="Soledad Cabrera" FontSize="20" HorizontalOptions="Center" />
+                <Label Text="Edad: 20" HorizontalOptions="Center" />
+                <Image Source="soledad.jpg" HeightRequest="100" WidthRequest="100" HorizontalOptions="Center" />
+            </VerticalStackLayout>
+        </Frame>
 
-        <Button Text="Add Person"
-            Grid.Row="1"
-            Clicked="OnNewButtonClicked" />
+        <!-- Campo de texto y botón para agregar personas -->
+        <HorizontalStackLayout Margin="10">
+            <Entry Placeholder="Nombre" Text="{Binding NewName}" x:Name="scabrera_entry" />
+            <Button Text="Agregar" Command="{Binding AddPersonCommand}" x:Name="scabrera_button_add" />
+        </HorizontalStackLayout>
 
-        <Label x:Name="statusMessage"
-           TextColor="{StaticResource Primary}"
-           Grid.Row="2" />
-
-        <Button Text="Get All People"
-            Grid.Row="3"
-            Clicked="OnGetButtonClicked" />
-
-        <CollectionView x:Name="peopleList" Grid.Row="4">
-            <CollectionView.ItemTemplate>
-                <DataTemplate x:DataType="model:Person">
-                    <Grid ColumnDefinitions="*,2*">
-                        <Label Text="{Binding Id}" TextColor="{StaticResource Primary}"/>
-                        <Label Grid.Column="1" Text="{Binding Name}" TextColor="{StaticResource Primary}"/>
-                    </Grid>
+        <!-- ListView para mostrar personas -->
+        <ListView ItemsSource="{Binding People}" x:Name="scabrera_listview">
+            <ListView.ItemTemplate>
+                <DataTemplate>
+                    <ViewCell>
+                        <StackLayout Orientation="Horizontal">
+                            <Label Text="{Binding Name}" VerticalOptions="Center" />
+                            <Button Text="Eliminar" Command="{Binding BindingContext.DeletePersonCommand, Source={x:Reference scabrera_listview}}" CommandParameter="{Binding}" />
+                        </StackLayout>
+                    </ViewCell>
                 </DataTemplate>
-            </CollectionView.ItemTemplate>
-        </CollectionView>
-
-    </Grid>
-
+            </ListView.ItemTemplate>
+        </ListView>
+    </VerticalStackLayout>
 </ContentPage>
+
